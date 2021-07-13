@@ -7,49 +7,32 @@ import TalkBasic.User;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 
 //服务端，监听端口，等待客户端的连接，等待通讯
 public class Service {
-    private ServerSocket ss=null;
-    //创建一个集合，存放多个用户，日日日如果这些用户登录，就认为是合法的。
-//    private static HashMap<String,User> Users=new HashMap<>();
-//    static{//在静态代码块，初始化users
-//        Users.put("1",new User("1","1"));
-//        Users.put("2",new User("2","2"));
-//        Users.put("3",new User("3","3"));
-//
-//    }
-
-    //验证用户是否有效的方法
-//    private boolean checkUser(String userId,String password) {
-//        User user = Users.get(userId);
-//        //先验证用户是否存在
-//        if (user == null) {
-//            return false;
-//        }
-//        //如果用户名真确返回密码的boolean值
-//        return user.getPassword().equals(password);
-//
-//    }
-
     public Service(){
         //端口可以写在配置文件中
         System.out.println("服务端在监听中...");
-        LoginSQL loginSQL = new LoginSQL();
+        ServerSocket ss = null;
+        Socket socket=null;
+        ObjectInputStream ois=null;
+        ObjectOutputStream oos=null;
+        ObjectOutputStream res=null;
         try {
             ss =new ServerSocket(21341);
             while(true)
             {
                 //当和某个客户端建立连接以后持续监听
-                Socket socket =ss.accept();
+                socket = ss.accept();
                 //得到socket关联的对象输入流
-                ObjectInputStream ois =new ObjectInputStream(socket.getInputStream());
+                ois=new ObjectInputStream(socket.getInputStream());
                 User u=(User)ois.readObject();//读取客户端发送的User对象
                 //得到socket关联的对象输出流
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos= new ObjectOutputStream(socket.getOutputStream());
                 Message message=new Message();
                 if(u.getReuser()!=null&&u.getRepwd()==null)
                 {
@@ -70,12 +53,14 @@ public class Service {
                 {
                     RegisterSQL resql = new RegisterSQL();
                     resql.UserSQL(u.getReuser(),u.getRepwd());
-                    ObjectOutputStream res =new ObjectOutputStream(socket.getOutputStream());
-                    message.setContent("用户："+u.getReuser()+"注册成功！");
-                    res.writeObject(message);
+//                    res=new ObjectOutputStream(socket.getOutputStream());
+//                    res.reset();
+//                    message.setContent("用户："+u.getReuser()+"注册成功！");
+//                    res.writeObject(message);
                 }
                 else
                 {
+                    LoginSQL loginSQL = new LoginSQL();
                     //创建一个Message对象，准备回复客户端
                     //验证用户登录
                     loginSQL.UserSQL(u.getUserId(),u.getPassword());
@@ -108,11 +93,34 @@ public class Service {
         finally {
             //如果服务端退出了while循环，因此我们需要关闭ServerSocket
             try {
+                assert ss != null;
                 ss.close();
+                assert socket != null;
+                socket.close();
+                assert ois != null;
+                ois.close();
+                assert oos != null;
+                oos.close();
+                assert res != null;
+                res.close();
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+}
+
+
+class MyObjectOutputStream  extends ObjectOutputStream{
+
+    public MyObjectOutputStream(OutputStream out) throws IOException {
+        super(out);
+    }
+
+    public void writeStreamHeader() throws IOException{
+        return;
+    }
 }
