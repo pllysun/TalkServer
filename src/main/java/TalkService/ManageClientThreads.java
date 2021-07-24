@@ -22,6 +22,9 @@ public class ManageClientThreads {
         hm.remove(userId);
     }
 
+    public static HashMap<String, ServiceConnectClientThread> getHm() {
+        return hm;
+    }
     //返回在线用户列表
 
     public static String getOnlineUser(){

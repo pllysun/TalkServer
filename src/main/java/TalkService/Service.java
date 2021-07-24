@@ -17,6 +17,8 @@ public class Service {
     public Service(){
         //端口可以写在配置文件中
         System.out.println("服务端在监听中...");
+        //启动服务推送新闻线程
+        new Thread(new SendNewsToAllService()).start();
         ServerSocket ss = null;
         Socket socket=null;
         ObjectInputStream ois=null;
@@ -38,7 +40,7 @@ public class Service {
                 {
                     //创建一个Message对象，验证数据库中的数据是否重复注册
                     RegisterSQL registerSQL = new RegisterSQL();
-                    boolean checkR = registerSQL.CheckRegister(u.getUserId());
+                    boolean checkR = registerSQL.CheckRegister(u.getReuser());
                     if(checkR)
                     {
                         message.setMesType(MessageType.MESSAGE_REGISTER_SUCCEED);
@@ -101,7 +103,7 @@ public class Service {
                 ois.close();
                 assert oos != null;
                 oos.close();
-                assert res != null;
+                assert false;
                 res.close();
 
 
@@ -114,13 +116,3 @@ public class Service {
 }
 
 
-class MyObjectOutputStream  extends ObjectOutputStream{
-
-    public MyObjectOutputStream(OutputStream out) throws IOException {
-        super(out);
-    }
-
-    public void writeStreamHeader() throws IOException{
-        return;
-    }
-}
