@@ -55,10 +55,10 @@ public class Service {
                 {
                     RegisterSQL resql = new RegisterSQL();
                     resql.UserSQL(u.getReuser(),u.getRepwd());
-//                    res=new ObjectOutputStream(socket.getOutputStream());
-//                    res.reset();
-//                    message.setContent("用户："+u.getReuser()+"注册成功！");
-//                    res.writeObject(message);
+                    //res=new ObjectOutputStream(socket.getOutputStream());
+                    //invalid type code: AC 之前报这个错误，原因是我new了一个新的流，用这个socket刚开始new的oos输出流就没有报错了
+                    message.setContent("用户："+u.getReuser()+"注册成功！");
+                    oos.writeObject(message);
                 }
                 else
                 {

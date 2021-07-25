@@ -35,9 +35,11 @@ public class ServiceConnectClientThread extends Thread{
         label:
         while(true)
         {
+            if(socket==null)break;
             System.out.println(userId+"和服务端建立连接");
+            ObjectInputStream ois = null;
             try {
-                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
                 Message message =(Message)ois.readObject();
                 //根据Message类型做相应的处理
                 switch (message.getMesType())
@@ -87,7 +89,6 @@ public class ServiceConnectClientThread extends Thread{
                                 //进行转发
                                 ObjectOutputStream oos = new ObjectOutputStream(hm.get(OnlineUerId).getSocket().getOutputStream());
                                 oos.writeObject(message);
-
                             }
                         }
                     }
@@ -100,7 +101,8 @@ public class ServiceConnectClientThread extends Thread{
                     default -> System.out.println("其他类型，暂时不处理！");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("用户："+userId+"断开了连接！");
+                break;
             }
         }
     }
