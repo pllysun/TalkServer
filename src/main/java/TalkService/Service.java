@@ -7,9 +7,9 @@ import TalkBasic.User;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 
 //服务端，监听端口，等待客户端的连接，等待通讯
@@ -66,13 +66,22 @@ public class Service {
                     //创建一个Message对象，准备回复客户端
                     //验证用户登录
                     loginSQL.UserSQL(u.getUserId(),u.getPassword());
-                    if(loginSQL.CheckLogin()){
+                    HashMap<String, ServiceConnectClientThread> hm = ManageClientThreads.getHm();
+                    ServiceConnectClientThread serviceConnectClientThread=null;
+                    serviceConnectClientThread = hm.get(u.getUserId());
+                    if(serviceConnectClientThread!=null){
+                        //如果登录的账号重复登录，则拒绝登录并发消息给客户端
+                        message.setMesType(MessageType.MESSAGE_REPEAT_LOGIN);
+                        oos.writeObject(message);
+                        System.out.println("用户："+u.getUserId()+"重复登录！");
+                    }
+                    else if(loginSQL.CheckLogin()){
                         //合法用户，验证通过
                         message.setMesType(MessageType.MESSAGE_LOGIN_SUCCEED);
                         //将message对象回复给客户端
                         oos.writeObject(message);
                         //创建一个线程和客户端保持通讯，该线程需要持有socket对象
-                        ServiceConnectClientThread serviceConnectClientThread = new ServiceConnectClientThread(socket, u.getUserId());
+                        serviceConnectClientThread = new ServiceConnectClientThread(socket, u.getUserId());
                         serviceConnectClientThread.start();
                         //把该线程对象，放入一个集合中，进行管理
                         ManageClientThreads.addClientThread(u.getUserId(), serviceConnectClientThread);
@@ -87,7 +96,6 @@ public class Service {
                         socket.close();
                     }
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();

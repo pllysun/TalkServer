@@ -101,6 +101,7 @@ public class ServiceConnectClientThread extends Thread{
                     default -> System.out.println("其他类型，暂时不处理！");
                 }
             } catch (Exception e) {
+                ManageClientThreads.removeServiceConnectClientThread(userId);
                 System.out.println("用户："+userId+"断开了连接！");
                 break;
             }

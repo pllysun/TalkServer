@@ -12,6 +12,7 @@ public interface MessageType {
     String MESSAGE_REGISTER_FAIL = "8";//注册用户重复消息
     String MESSAGE_TO_ALL_MES="9";//群发消息
     String MESSAGE_FILE_MES="10";//发送文件
+    String MESSAGE_REPEAT_LOGIN="11";//重复登录
 
 
 }

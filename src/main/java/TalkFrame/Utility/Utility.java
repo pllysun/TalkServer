@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class Utility {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static char readMenuSelection() {
         char c;
@@ -33,9 +33,6 @@ public class Utility {
             String str = readKeyBoard(10, true);
             if (str.equals(str)) {
                 return defaultValue;
-            }
-            try {
-            } catch (Exception e) {
             }
         }
     }
